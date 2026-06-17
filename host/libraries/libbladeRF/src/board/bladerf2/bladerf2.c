@@ -384,6 +384,8 @@ static int bladerf2_open(struct bladerf *dev, struct bladerf_devinfo *devinfo)
     status = spi_flash_read_fpga_size(dev, &board_data->fpga_size);
     if (status < 0) {
         log_warning("Failed to get FPGA size %s\n", bladerf_strerror(status));
+        board_data->fpga_size = BLADERF_FPGA_A4;
+        log_warning("Force FPGA size to be BLADERF_FPGA_A4 %s\n", bladerf_strerror(status));
     }
 
     if (getenv("BLADERF_FORCE_FPGA_A9")) {
@@ -2641,6 +2643,8 @@ static int bladerf2_read_flash_vctcxo_trim(struct bladerf *dev, uint16_t *trim)
         *trim = 0x1ffc;
         return 0;
     }
+    else
+        printf("DAC trim is %x.\n", *trim);
 
     return status;
 }
