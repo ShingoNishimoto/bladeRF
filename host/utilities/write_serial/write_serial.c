@@ -6,7 +6,8 @@
  * Serial number is stored under key "S", must be exactly 32 hex chars.
  *
  * Build:
- *   gcc -o write_serial write_serial.c -lbladeRF
+ *   make                     (standalone, see the Makefile in this directory)
+ * or, in-tree, as part of the host/ CMake build.
  *
  * Usage:
  *   sudo ./write_serial <32-hex-digit serial>
@@ -24,7 +25,10 @@
 #define SERIAL_KEY_LEN    1
 #define SERIAL_VAL_LEN    32   /* BLADERF_SERIAL_LENGTH - 1 */
 
-/* CRC-16/CCITT-FALSE as used by the bladeRF binkv encoder */
+/* CRC-16 with polynomial 0x1021 and a zero initial value (the "XMODEM"
+ * variant -- note this is NOT CCITT-FALSE, which seeds with 0xffff).
+ * This is a reimplementation of zcrc() from firmware_common/misc.h, which is
+ * what libbladeRF's binkv_encode_field()/binkv_decode_field() use. */
 static uint16_t zcrc(const uint8_t *buf, int len)
 {
     uint16_t crc = 0;
